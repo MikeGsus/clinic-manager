@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: clinic-manager-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: clinic_manager
+      POSTGRES_USER: clinic_user
+      POSTGRES_PASSWORD: clinic_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic_user -d clinic_manager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm info:*)",
+      "Bash(docker compose up:*)",
+      "Bash(docker exec:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npx tsx:*)",
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(node -e \":*)",
+      "Bash(node -e:*)",
+      "Bash(kill:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

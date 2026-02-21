@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  doctor
+  enfermera
+  recepcionista
+  paciente
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(recepcionista)
+  curp      String?  @unique
+  rfc       String?  @unique
+  phone     String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Patients assigned to this doctor
+  patients       Patient[]       @relation("DoctorPatients")
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]
+  passwordResets PasswordReset[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  entity    String?
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+model PasswordReset {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("password_resets")
+}
+
+model Patient {
+  id            String   @id @default(uuid())
+  name          String
+  email         String?  @unique
+  phone         String?
+  dateOfBirth   DateTime?
+  curp          String?  @unique
+  rfc           String?  @unique
+  address       String?
+  bloodType     String?
+  allergies     String?
+  notes         String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Assigned doctor
+  doctorId String?
+  doctor   User?   @relation("DoctorPatients", fields: [doctorId], references: [id])
+
+  @@map("patients")
+}
