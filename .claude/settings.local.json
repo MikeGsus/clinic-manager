@@ -15,7 +15,8 @@
       "Bash(node -e \":*)",
       "Bash(node -e:*)",
       "Bash(kill:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
