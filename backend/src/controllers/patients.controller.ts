@@ -15,8 +15,8 @@ const patientSchema = z.object({
   email: z.string().email().optional(),
   phone: phoneSchema,
   dateOfBirth: z.string().datetime().optional(),
-  curp: z.string().max(18).optional(),
-  rfc: z.string().max(12).optional(),
+  curp: z.string().length(18).optional(),
+  rfc: z.string().length(13).optional(),
   address: z.string().optional(),
   bloodType: z.string().optional(),
   allergies: z.string().optional(),
@@ -39,7 +39,7 @@ export async function getAll(req: Request, res: Response): Promise<void> {
 
 export async function getById(req: Request, res: Response): Promise<void> {
   const { role, id: actorId } = getActor(req);
-  const patient = await patientsService.getPatientById(req.params.id, role, actorId);
+  const patient = await patientsService.getPatientById(req.params.id as string, role, actorId);
   res.json(ok(patient));
 }
 
@@ -55,7 +55,7 @@ export async function create(req: Request, res: Response): Promise<void> {
 export async function update(req: Request, res: Response): Promise<void> {
   const { role, id: actorId } = getActor(req);
   const data = updatePatientSchema.parse(req.body);
-  const patient = await patientsService.updatePatient(req.params.id, role, actorId, {
+  const patient = await patientsService.updatePatient(req.params.id as string, role, actorId, {
     ...data,
     dateOfBirth: data.dateOfBirth ? new Date(data.dateOfBirth) : undefined,
   });
@@ -64,6 +64,6 @@ export async function update(req: Request, res: Response): Promise<void> {
 
 export async function remove(req: Request, res: Response): Promise<void> {
   const { role, id: actorId } = getActor(req);
-  await patientsService.deletePatient(req.params.id, role, actorId);
+  await patientsService.deletePatient(req.params.id as string, role, actorId);
   res.json(ok(null, 'Patient deactivated'));
 }

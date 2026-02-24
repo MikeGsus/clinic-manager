@@ -29,10 +29,15 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Patients assigned to this doctor
-  patients       Patient[]       @relation("DoctorPatients")
-  refreshTokens  RefreshToken[]
-  auditLogs      AuditLog[]
-  passwordResets PasswordReset[]
+  patients              Patient[]            @relation("DoctorPatients")
+  refreshTokens         RefreshToken[]
+  auditLogs             AuditLog[]
+  passwordResets        PasswordReset[]
+  doctorSchedules       DoctorSchedule[]     @relation("DoctorSchedules")
+  scheduleExceptions    ScheduleException[]  @relation("DoctorExceptions")
+  appointmentsAsDoctor  Appointment[]        @relation("DoctorAppointments")
+  cancelledAppointments Appointment[]        @relation("CancelledAppointments")
+  waitingListAsDoctor   WaitingList[]        @relation("DoctorWaitingList")
 
   @@map("users")
 }
@@ -95,5 +100,114 @@ model Patient {
   doctorId String?
   doctor   User?   @relation("DoctorPatients", fields: [doctorId], references: [id])
 
+  appointments  Appointment[]
+  waitingList   WaitingList[]
+
   @@map("patients")
+}
+
+// ─── Appointment enums ───────────────────────────────────────────────────────
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CHECKED_IN
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  RESCHEDULED
+}
+
+enum AppointmentType {
+  CONSULTA
+  SEGUIMIENTO
+  URGENCIA
+  PROCEDIMIENTO
+  OTRO
+}
+
+// ─── Schedule models ─────────────────────────────────────────────────────────
+
+model DoctorSchedule {
+  id           String   @id @default(uuid())
+  doctorId     String
+  doctor       User     @relation("DoctorSchedules", fields: [doctorId], references: [id], onDelete: Cascade)
+  dayOfWeek    Int      // 0=Sunday … 6=Saturday
+  startTime    String   // "HH:mm"
+  endTime      String   // "HH:mm"
+  slotDuration Int      @default(30) // minutes
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([doctorId, dayOfWeek])
+  @@map("doctor_schedules")
+}
+
+model ScheduleException {
+  id          String   @id @default(uuid())
+  doctorId    String
+  doctor      User     @relation("DoctorExceptions", fields: [doctorId], references: [id], onDelete: Cascade)
+  date        DateTime @db.Date
+  isBlocked   Boolean  @default(true)  // true = day off; false = custom hours
+  startTime   String?
+  endTime     String?
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  @@unique([doctorId, date])
+  @@map("schedule_exceptions")
+}
+
+// ─── Appointment models ───────────────────────────────────────────────────────
+
+model Appointment {
+  id           String            @id @default(uuid())
+  patientId    String
+  patient      Patient           @relation(fields: [patientId], references: [id])
+  doctorId     String
+  doctor       User              @relation("DoctorAppointments", fields: [doctorId], references: [id])
+  scheduledAt  DateTime          // UTC
+  durationMins Int               @default(30)
+  status       AppointmentStatus @default(SCHEDULED)
+  type         AppointmentType   @default(CONSULTA)
+  notes        String?
+  qrToken      String            @unique @default(uuid())
+  checkedInAt  DateTime?
+  cancelledById String?
+  cancelledBy   User?            @relation("CancelledAppointments", fields: [cancelledById], references: [id])
+  cancellationReason String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  reminders    AppointmentReminder[]
+
+  @@map("appointments")
+}
+
+model WaitingList {
+  id            String   @id @default(uuid())
+  patientId     String
+  patient       Patient  @relation(fields: [patientId], references: [id])
+  doctorId      String?
+  doctor        User?    @relation("DoctorWaitingList", fields: [doctorId], references: [id])
+  preferredDate DateTime?
+  notes         String?
+  notifiedAt    DateTime?
+  createdAt     DateTime @default(now())
+
+  @@map("waiting_list")
+}
+
+model AppointmentReminder {
+  id            String   @id @default(uuid())
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  channel       String   // "email" | "whatsapp"
+  scheduledFor  DateTime
+  sentAt        DateTime?
+  status        String   @default("pending") // "pending" | "sent" | "failed"
+  createdAt     DateTime @default(now())
+
+  @@map("appointment_reminders")
 }

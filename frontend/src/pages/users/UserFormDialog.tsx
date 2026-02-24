@@ -29,16 +29,16 @@ const createSchema = z.object({
   password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
   role: z.enum(['admin', 'doctor', 'enfermera', 'recepcionista', 'paciente']),
   phone: z.string().optional(),
-  curp: z.string().optional(),
-  rfc: z.string().optional(),
+  curp: z.string().length(18, 'El CURP debe tener exactamente 18 caracteres').optional(),
+  rfc: z.string().length(13, 'El RFC debe tener exactamente 13 caracteres').optional(),
 });
 
 const editSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
   role: z.enum(['admin', 'doctor', 'enfermera', 'recepcionista', 'paciente']),
   phone: z.string().optional(),
-  curp: z.string().optional(),
-  rfc: z.string().optional(),
+  curp: z.string().length(18, 'El CURP debe tener exactamente 18 caracteres').optional(),
+  rfc: z.string().length(13, 'El RFC debe tener exactamente 13 caracteres').optional(),
 });
 
 const ROLES = [
@@ -244,7 +244,7 @@ export function UserFormDialog({ open, onOpenChange, user }: UserFormDialogProps
 
             <div className="space-y-2">
               <Label htmlFor="rfc">RFC</Label>
-              <Input id="rfc" maxLength={12} {...upperRegister('rfc')} />
+              <Input id="rfc" maxLength={13} {...upperRegister('rfc')} />
               {(errors as any).rfc && (
                 <p className="text-sm text-red-500">{(errors as any).rfc.message}</p>
               )}

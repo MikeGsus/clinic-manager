@@ -11,6 +11,11 @@ import { Dashboard } from '@/pages/Dashboard';
 import { ProfilePage } from '@/pages/profile/ProfilePage';
 import { UsersPage } from '@/pages/users/UsersPage';
 import { AuditLogsPage } from '@/pages/admin/AuditLogsPage';
+import { AppointmentsPage } from '@/pages/appointments/AppointmentsPage';
+import { AppointmentDetailPage } from '@/pages/appointments/AppointmentDetailPage';
+import { WaitingListPage } from '@/pages/appointments/WaitingListPage';
+import { DoctorSchedulePage } from '@/pages/schedule/DoctorSchedulePage';
+import { CheckInPage } from '@/pages/checkin/CheckInPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,12 +36,35 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/checkin/:token" element={<CheckInPage />} />
 
             {/* Protected routes — any authenticated user */}
             <Route element={<ProtectedRoute />}>
               <Route element={<Layout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/appointments/:id" element={<AppointmentDetailPage />} />
+              </Route>
+            </Route>
+
+            {/* Appointments — all staff + paciente */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'doctor', 'enfermera', 'recepcionista', 'paciente']} />}>
+              <Route element={<Layout />}>
+                <Route path="/appointments" element={<AppointmentsPage />} />
+              </Route>
+            </Route>
+
+            {/* Waiting list — admin + recepcionista */}
+            <Route element={<ProtectedRoute allowedRoles={['admin', 'recepcionista']} />}>
+              <Route element={<Layout />}>
+                <Route path="/appointments/waiting-list" element={<WaitingListPage />} />
+              </Route>
+            </Route>
+
+            {/* Doctor schedule — doctor + admin */}
+            <Route element={<ProtectedRoute allowedRoles={['doctor']} />}>
+              <Route element={<Layout />}>
+                <Route path="/schedule" element={<DoctorSchedulePage />} />
               </Route>
             </Route>
 

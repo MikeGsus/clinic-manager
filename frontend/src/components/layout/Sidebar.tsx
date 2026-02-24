@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Users, UserCircle, LayoutDashboard, Shield } from 'lucide-react';
+import { Users, UserCircle, LayoutDashboard, Shield, Calendar, Clock, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/auth.store';
 import type { Role } from '@/types';
@@ -25,6 +25,24 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Pacientes',
     icon: UserCircle,
     roles: ['admin', 'doctor', 'enfermera', 'recepcionista'],
+  },
+  {
+    to: '/appointments',
+    label: 'Citas',
+    icon: Calendar,
+    roles: ['admin', 'doctor', 'enfermera', 'recepcionista'],
+  },
+  {
+    to: '/appointments/waiting-list',
+    label: 'Lista de Espera',
+    icon: Clock,
+    roles: ['admin', 'recepcionista'],
+  },
+  {
+    to: '/schedule',
+    label: 'Mi Horario',
+    icon: Settings,
+    roles: ['doctor'],
   },
   {
     to: '/users',

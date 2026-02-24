@@ -29,8 +29,8 @@ const profileSchema = z.object({
     .regex(/^\d{10}$/, 'El teléfono debe tener exactamente 10 dígitos')
     .optional()
     .or(z.literal('')),
-  curp: z.string().optional(),
-  rfc: z.string().optional(),
+  curp: z.string().length(18, 'El CURP debe tener exactamente 18 caracteres').optional(),
+  rfc: z.string().length(13, 'El RFC debe tener exactamente 13 caracteres').optional(),
 });
 
 type ProfileForm = z.infer<typeof profileSchema>;
@@ -138,7 +138,7 @@ export function ProfilePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="rfc">RFC</Label>
-                <Input id="rfc" maxLength={12} {...upperRegister('rfc')} />
+                <Input id="rfc" maxLength={13} {...upperRegister('rfc')} />
                 {errors.rfc && (
                   <p className="text-sm text-red-500">{errors.rfc.message}</p>
                 )}

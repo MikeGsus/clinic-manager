@@ -16,8 +16,8 @@ const createUserSchema = z.object({
   password: z.string().min(8),
   name: z.string().min(1),
   role: z.enum(['admin', 'doctor', 'enfermera', 'recepcionista', 'paciente']),
-  curp: z.string().max(18).optional(),
-  rfc: z.string().max(12).optional(),
+  curp: z.string().length(18).optional(),
+  rfc: z.string().length(13).optional(),
   phone: phoneSchema,
 });
 
@@ -29,13 +29,18 @@ const updateUserSchema = createUserSchema
 const updateMeSchema = z.object({
   name: z.string().min(1).optional(),
   phone: phoneSchema,
-  curp: z.string().max(18).optional(),
-  rfc: z.string().max(12).optional(),
+  curp: z.string().length(18).optional(),
+  rfc: z.string().length(13).optional(),
 });
 
 export async function getAll(_req: Request, res: Response): Promise<void> {
   const users = await usersService.getAllUsers();
   res.json(ok(users));
+}
+
+export async function getDoctors(_req: Request, res: Response): Promise<void> {
+  const doctors = await usersService.getUsersByRole('doctor');
+  res.json(ok(doctors));
 }
 
 export async function getById(req: Request, res: Response): Promise<void> {

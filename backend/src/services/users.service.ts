@@ -3,6 +3,14 @@ import { prisma } from '../lib/prisma.js';
 import { AppError } from '../middleware/error.middleware.js';
 import type { Role } from '@prisma/client';
 
+export async function getUsersByRole(role: Role) {
+  return prisma.user.findMany({
+    where: { role, active: true },
+    select: { id: true, email: true, name: true, role: true },
+    orderBy: { name: 'asc' },
+  });
+}
+
 export async function getAllUsers() {
   return prisma.user.findMany({
     select: {

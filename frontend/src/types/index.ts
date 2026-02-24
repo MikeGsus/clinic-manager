@@ -54,3 +54,76 @@ export interface AuditLog {
   createdAt: string;
   user?: Pick<User, 'id' | 'name' | 'email'>;
 }
+
+// ─── Appointments ─────────────────────────────────────────────────────────────
+
+export type AppointmentStatus =
+  | 'SCHEDULED'
+  | 'CONFIRMED'
+  | 'CHECKED_IN'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'NO_SHOW'
+  | 'RESCHEDULED';
+
+export type AppointmentType =
+  | 'CONSULTA'
+  | 'SEGUIMIENTO'
+  | 'URGENCIA'
+  | 'PROCEDIMIENTO'
+  | 'OTRO';
+
+export interface Appointment {
+  id: string;
+  patientId: string;
+  patient: Pick<Patient, 'id' | 'name' | 'email' | 'phone'>;
+  doctorId: string;
+  doctor: Pick<User, 'id' | 'name' | 'email'>;
+  scheduledAt: string;
+  durationMins: number;
+  status: AppointmentStatus;
+  type: AppointmentType;
+  notes?: string;
+  qrToken: string;
+  checkedInAt?: string;
+  cancellationReason?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ScheduleDay {
+  id: string;
+  doctorId: string;
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  slotDuration: number;
+  isActive: boolean;
+}
+
+export interface ScheduleException {
+  id: string;
+  doctorId: string;
+  date: string;
+  isBlocked: boolean;
+  startTime?: string;
+  endTime?: string;
+  reason?: string;
+}
+
+export interface WaitingListEntry {
+  id: string;
+  patientId: string;
+  patient: Pick<Patient, 'id' | 'name' | 'email' | 'phone'>;
+  doctorId?: string;
+  doctor?: Pick<User, 'id' | 'name'>;
+  preferredDate?: string;
+  notes?: string;
+  notifiedAt?: string;
+  createdAt: string;
+}
+
+export interface TimeSlot {
+  time: string;      // "HH:mm"
+  available: boolean;
+}
